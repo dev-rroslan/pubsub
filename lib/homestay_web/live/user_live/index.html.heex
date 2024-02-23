@@ -1,0 +1,61 @@
+<.header>
+  Listing Users
+</.header>
+<div style="text-align: center;">
+  <.simple_form
+    for={%{}}
+    as={:search}
+    id="search-form"
+    name="any"
+    class="mt-0"
+    phx-change="search"
+  >
+    <input
+      type="text"
+      name="search_key"
+      class="rounded-lg focus:outline-none focus:border-emLavender focus:ring-0 px-3 py-1 bg-emDark-dark placeholder-emDark-light text-white font-brand font-regular text-sm mr-5 border-white"
+      placeholder="Search User"
+    />
+  </.simple_form>
+</div>
+
+<.link phx-click="new" class="btn btn-primary">New User</.link>
+<div class="flex justify-center">
+<.table
+  id="homes"
+  rows={@streams.users}
+  row_click={fn {_id, user} -> JS.navigate(~p"/users/#{user}/profile") end}
+>
+  <:col :let={{_id, user}} label="Email"><%= user.email %></:col>
+  <:col :let={{_id, user}} label="Is Super Admin">
+    <%= if "super_admin" in (user.roles |> Enum.map(fn role -> role.id end)) do %>
+      <i class="fa fa-check" style="color: orange; margin-left: 15px;"></i>
+    <% else %>
+      <i class="fa fa-close" style="color: red; margin-left: 15px;"></i>
+    <% end %>
+  </:col>
+  <:col :let={{_id, user}} label="Is Admin">
+    <%= if "admin" in (user.roles |> Enum.map(fn role -> role.id end)) do %>
+      <i class="fa fa-check" style="color: orange; margin-left: 15px;"></i>
+    <% else %>
+      <i class="fa fa-close" style="color: red; margin-left: 15px;"></i>
+    <% end %>
+  </:col>
+  <:col :let={{_id, user}} label="Is Homeowner">
+    <%= if "homeowner" in (user.roles |> Enum.map(fn role -> role.id end)) do %>
+      <i class="fa fa-check" style="color: orange; margin-left: 22px;"></i>
+    <% else %>
+      <i class="fa fa-close" style="color: red; margin-left: 22px;"></i>
+    <% end %>
+  </:col>
+
+  <:action :let={{_id, user}}>
+    <.link phx-click="make_admin" phx-value-id={user.id}>Make Admin</.link>
+  </:action>
+  <:action :let={{_id, user}}>
+    <.link phx-click={JS.push("delete", value: %{id: user.id})} data-confirm="Are you sure?">
+      Delete
+    </.link>
+  </:action>
+</.table>
+</div>

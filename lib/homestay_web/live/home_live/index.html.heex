@@ -1,0 +1,46 @@
+<.header>
+  Listing Homes
+  <:actions>
+    <.link patch={~p"/homes/new"}>
+      <.button>New Home</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="homes"
+  rows={@streams.homes}
+  row_click={fn {_id, home} -> JS.navigate(~p"/homes/#{home}") end}
+>
+  <:col :let={{_id, home}} label="Home address"><%= home.home_address %></:col>
+  <:col :let={{_id, home}} label="Street"><%= home.street %></:col>
+  <:col :let={{_id, home}} label="Area"><%= home.area %></:col>
+  <:col :let={{_id, home}} label="Zip"><%= home.zip %></:col>
+  <:col :let={{_id, home}} label="State"><%= home.state %></:col>
+  <:col :let={{_id, home}} label="Price per day"><%= home.price_per_day %></:col>
+  <:action :let={{_id, home}}>
+    <div class="sr-only">
+      <.link navigate={~p"/homes/#{home}"}>Show</.link>
+    </div>
+    <.link patch={~p"/homes/#{home}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, home}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: home.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal :if={@live_action in [:new, :edit]} id="home-modal" show on_cancel={JS.patch(~p"/homes")}>
+  <.live_component
+    module={HomestayWeb.HomeLive.FormComponent}
+    id={@home.id || :new}
+    title={@page_title}
+    action={@live_action}
+    home={@home}
+    patch={~p"/homes"}
+  />
+</.modal>

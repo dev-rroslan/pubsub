@@ -1,0 +1,50 @@
+<.header>
+  User <%= @user.id %>
+  <:subtitle>Profile.</:subtitle>
+  <:actions>
+    <%= if @user.homeowner do %>
+    <.link patch={~p"/profile/home"}>
+    <.button>+ Homes</.button>
+</.link>
+<% else %>
+    <.link patch={~p"/profile/homeowner"}>
+      <.button>+ Homeowner</.button>
+    </.link>
+<% end %>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Email"><%= @user.email %></:item>
+  <:item title="Roles"><%= Enum.map(@user.roles || [], fn role -> role.title end) |> Enum.join(",") %></:item>
+  <:item :if={@user.homeowner} title="Name"><%= @user && @user.homeowner && @user.homeowner.name %></:item>
+  <:item :if={@user.homeowner} title="Whatsapp"><%= @user && @user.homeowner && @user.homeowner.whatapp_phone_no %></:item>
+  <:item :if={@user.homeowner} title="Account No"><%= @user && @user.homeowner && @user.homeowner.account_no %></:item>
+  <:item :if={@user.homeowner} title="Bank E-wallet"><%= @user && @user.homeowner && @user.homeowner.bank_ewallet %></:item>
+  <:item :if={@user.homeowner} title="Homes"><%= length(@user.homeowner.homes || [])%></:item>
+</.list>
+
+<.modal :if={@live_action in [:homeowner]} id="homeowner-modal" show on_cancel={JS.patch(~p"/users/#{@user.id}/profile")}>
+<.live_component
+module={HomestayWeb.UserLive.FormComponent}
+id={@homeowner.id || :new}
+title={@page_title}
+subtitle={@subtitle}
+action={@live_action}
+homeowner={@homeowner}
+current_user={@user}
+patch={~p"/users/#{@user.id}/profile"}
+/>
+</.modal>
+
+<.modal :if={@live_action in [:home]} id="home-modal" show on_cancel={JS.patch(~p"/users/#{@user.id}/profile")}>
+<.live_component
+module={HomestayWeb.UserLive.HomeFormComponent}
+id={@home.id || :new}
+title={@page_title}
+action={@live_action}
+home={@home}
+current_user={@user}
+patch={~p"/users/#{@user.id}/profile"}
+/>
+</.modal>
